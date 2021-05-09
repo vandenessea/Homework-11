@@ -1,8 +1,8 @@
 // DEPENDENCIES
 // Series of npm packages that we will use to give our server useful functionality
-const express = require('express');
-const path = require('path');
-const fs = require('fs');
+const express = require("express");
+const path = require("path");
+const fs = require("fs");
 
 // Tells node that we are creating an "express" server
 const app = express();
@@ -26,7 +26,8 @@ app.get("/notes", function (req, res) {
 
 // This API route is reading the db.json file and parsing the data
 app.get("/api/notes", (req, res) => {
-  fs.readFile(path.join(__dirname, "/db/db.json"), function (error, response) {
+  fs.readFile("db/db.json", function (error, response) {
+    if(error) throw error;
     const notes = JSON.parse(response);
     console.log(notes);
     res.json(notes);
