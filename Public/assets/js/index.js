@@ -52,13 +52,14 @@ const deleteNote = (id) =>
 
 const renderActiveNote = () => {
   hide(saveNoteBtn);
-
   if (activeNote.id) {
     noteTitle.setAttribute('readonly', true);
     noteText.setAttribute('readonly', true);
     noteTitle.value = activeNote.title;
     noteText.value = activeNote.text;
   } else {
+    noteTitle.readOnly = false;
+    noteText.readOnly = false;
     noteTitle.value = '';
     noteText.value = '';
   }
@@ -96,7 +97,13 @@ const handleNoteDelete = (e) => {
 // Sets the activeNote and displays it
 const handleNoteView = (e) => {
   e.preventDefault();
-  activeNote = JSON.parse(e.target.parentElement.getAttribute('data-note'));
+
+  if (e.target.nodeName === 'LI') {
+    activeNote = JSON.parse(e.target.getAttribute('data-note')) || {};
+  }
+  if (e.target.nodeName === 'SPAN') {
+    activeNote = JSON.parse(e.target.parentElement.getAttribute('data-note')) || {};
+  }
   renderActiveNote();
 };
 
@@ -106,8 +113,12 @@ const handleNewNoteView = (e) => {
   renderActiveNote();
 };
 
+const checkIfReadonly = () => {
+  return noteTitle.readOnly || noteText.readOnly;
+};
+
 const handleRenderSaveBtn = () => {
-  if (!noteTitle.value.trim() || !noteText.value.trim()) {
+  if (!noteTitle.value.trim() || !noteText.value.trim() || checkIfReadonly()) {
     hide(saveNoteBtn);
   } else {
     show(saveNoteBtn);
@@ -127,22 +138,16 @@ const renderNoteList = async (notes) => {
   const createLi = (text, delBtn = true) => {
     const liEl = document.createElement('li');
     liEl.classList.add('list-group-item');
+    liEl.addEventListener('click', handleNoteView);
 
     const spanEl = document.createElement('span');
     spanEl.innerText = text;
-    spanEl.addEventListener('click', handleNoteView);
 
     liEl.append(spanEl);
 
     if (delBtn) {
       const delBtnEl = document.createElement('i');
-      delBtnEl.classList.add(
-        'fas',
-        'fa-trash-alt',
-        'float-right',
-        'text-danger',
-        'delete-note'
-      );
+      delBtnEl.classList.add('fas', 'fa-trash-alt', 'float-right', 'text-danger', 'delete-note');
       delBtnEl.addEventListener('click', handleNoteDelete);
 
       liEl.append(delBtnEl);
